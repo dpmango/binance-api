@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Binance api client</title>
+    <meta name="color-scheme" content="dark light">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.3/dist/css/bootstrap-nightfall.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    
+    <style>
+      pre {
+        white-space: pre-wrap;
+        max-height: 240px;
+        border-radius: 0.375rem;
+        background: black;
+        padding: 10px 14px;
+      }
+      form{
+        max-width: 400px;
+      }
+      .card{
+        --bs-card-spacer-y: 0.5rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="courses mt-2">
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="h3 me-2">Курсы</div>
+          <button class="btn btn-primary js-course-timer"><span>0s</span> Обновить</button>
+        </div>
+        
+        <div class="row js-rates">
+          <!-- injected from js -->
+        </div>
+      </div>
+    </div>
+
+    <div class="accounts mt-4">
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="h3 me-2">Валюты</div>
+          <button class="btn btn-primary js-accounts-timer"><span>0s</span> Обновить</button>
+        </div>
+
+        <div class="row js-accounts">
+          <!-- injected from js -->
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs mt-4">
+      <div class="container">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#buy" href="#">Купить</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" data-bs-target="#sell" href="#">Продать</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" data-bs-target="#withdraw" href="#">Вывести</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" data-bs-target="#deposit" href="#">Депозит</a>
+          </li>
+        </ul>
+
+        <div class="tab-content mt-3">
+           <!-- Вкладка купить -->
+          <div class="tab-pane active" id="buy" role="tabpanel">
+            <form class="needs-validation js-buy-form" novalidate>
+              <input type="hidden" name="side" value="buy" />
+              <div class="mb-3">
+                <label for="b_pair" class="form-label">Пара</label>
+                <select class="form-select js-pair-select" id="b_pair" name="pair" required>
+                  <option selected disabled value="">Выбрать пару</option>
+                </select>
+                <div class="invalid-feedback">
+                  Выберите пару
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="b_quantity" class="form-label">Количество</label>
+                <input type="text" class="form-control" id="b_quantity" name="quantity" required>
+                <div class="invalid-feedback">
+                  Введите количество
+                </div>
+              </div>
+              <button type="submit" class="btn btn-success">Купить по рыночной</button>
+            </form>
+
+            <div class="table-responsive mt-2">
+              <table class="table js-trade-table">
+                <thead>
+                  <tr>
+                    <th>Пара</th>
+                    <th>Время</th>
+                    <th>Цена</th>
+                    <th>Количество</th>
+                    <th>Коммисия</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- populated from js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+           <!-- Вкладка продать -->
+          <div class="tab-pane" id="sell" role="tabpanel">
+            <form class="needs-validation js-sell-form" novalidate>
+              <input type="hidden" name="side" value="sell" />
+              <div class="mb-3">
+                <label for="s_pair" class="form-label">Пара</label>
+                <select class="form-select js-pair-select" id="s_pair" name="pair" required>
+                  <option selected disabled value="">Выбрать пару</option>
+                </select>
+                <div class="invalid-feedback">
+                  Выберите пару
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="s_quantity" class="form-label">Количество</label>
+                <input type="text" class="form-control" id="s_quantity" name="quantity" required>
+                <div class="invalid-feedback">
+                  Введите количество
+                </div>
+              </div>
+              <button type="submit" class="btn btn-danger">Продать по рыночной</button>
+            </form>
+
+            <div class="table-responsive mt-2">
+              <table class="table js-trade-table">
+                <thead>
+                  <tr>
+                    <th>Пара</th>
+                    <th>Время</th>
+                    <th>Цена</th>
+                    <th>Количество</th>
+                    <th>Коммисия</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- populated from js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Вкладка вывод -->
+          <div class="tab-pane" id="withdraw" role="tabpanel">
+            <form class="needs-validation js-withdraw-form" novalidate>
+              <div class="mb-3">
+                <label for="w_coin" class="form-label">Монета</label>
+                <input type="text" class="form-control" id="w_coin" name="coin" required>
+              </div>
+              <div class="mb-3">
+                <label for="w_network" class="form-label">Сеть</label>
+                <input type="text" class="form-control" id="w_network" name="network" required>
+              </div>
+              <div class="mb-3">
+                <label for="w_address" class="form-label">Адресс</label>
+                <input type="text" class="form-control" id="w_address" name="address" required>
+              </div>
+              <div class="mb-3">
+                <label for="w_amount" class="form-label">Количество</label>
+                <input type="text" class="form-control" id="w_amount" name="amount" required>
+              </div>
+              <button type="submit" class="btn btn-danger">Вывести</button>
+            </form>
+
+            <button class="btn mt-3 btn-info js-get-networks">Получить информацию по сетям</button>
+          
+            <div class="table-responsive mt-2">
+              <table class="table js-withdraw-table">
+                <thead>
+                  <tr>
+                    <th>Монета</th>
+                    <th>ID</th>
+                    <th>Статус</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- populated from js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+           <!-- Вкладка депозит -->
+          <div class="tab-pane" id="deposit" role="tabpanel">
+            <form class="needs-validation js-deposit-form" novalidate>
+              <div class="mb-3">
+                <label for="d_coin" class="form-label">Монета</label>
+                <input type="text" class="form-control" id="d_coin" name="coin" required>
+              </div>
+              <div class="mb-3">
+                <label for="d_network" class="form-label">Сеть</label>
+                <input type="text" class="form-control" id="d_network" name="network" required>
+              </div>
+              <button type="submit" class="btn btn-danger">Депозит</button>
+            </form>
+
+            <button class="btn mt-3 btn-info js-get-networks">Получить информацию по сетям</button>
+            
+            <div class="table-responsive mt-2">
+              <table class="table js-deposit-table">
+                <thead>
+                  <tr>
+                    <th>Монета</th>
+                    <th>Адрес</th>
+                    <th>Url</th>
+                    <th>Tag</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- populated from js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="logger mt-4 mb-4">
+      <div class="container">
+        <code>
+          <pre class="js-logger"></pre>
+        </code>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+    <!-- <script src="app.js" text="type/javascript"></script> -->
+
+<script>
+var APP = window.APP || {};
+
+// Initializer module
+(function (APP) {
+  APP.Initilizer = {
+    config: {
+      rates: {
+        interval: null,
+        curTime: 0,
+        refresh: 30,
+      },
+      wallet: {
+        interval: null,
+        curTime: 0,
+        refresh: 60,
+      },
+    },
+    init: function () {
+      this.rates();
+      this.wallet();
+      this.forms();
+      this.history();
+      this.infoButtons();
+    },
+    rates: function () {
+      APP.Binance.getRates();
+
+      const $timer = document.querySelector(".js-course-timer");
+      this.createInterval($timer, "rates", () => {
+        APP.Binance.getRates();
+      });
+    },
+    wallet: function () {
+      APP.Binance.getWallet();
+      APP.Binance.getWithdrawHistory();
+
+      const $timer = document.querySelector(".js-accounts-timer");
+      this.createInterval($timer, "wallet", () => {
+        APP.Binance.getWallet();
+        APP.Binance.getWithdrawHistory();
+      });
+    },
+    forms: function () {
+      APP.Binance.populateSelects();
+
+      const forms = [
+        { selector: ".js-buy-form", func: "sendMarketOrder" },
+        { selector: ".js-sell-form", func: "sendMarketOrder" },
+        { selector: ".js-withdraw-form", func: "withdrawCoins" },
+        { selector: ".js-deposit-form", func: "depositCoins" },
+      ];
+
+      forms.forEach((form) => {
+        const $formDom = document.querySelector(form.selector);
+
+        $formDom.addEventListener("submit", (e) => {
+          e.preventDefault();
+          $formDom.querySelector('input[type="text"]').classList.remove("is-invalid");
+
+          if ($formDom.checkValidity()) {
+            const formData = new FormData($formDom);
+            const formEntries = Object.fromEntries(formData.entries());
+
+            APP.Binance[form.func](formEntries, $formDom);
+          }
+
+          $formDom.classList.add("was-validated");
+        });
+      });
+    },
+    history: function () {
+      const trades = APP.Binance.utils.getLocalStorage("trades");
+      const withdraws = APP.Binance.utils.getLocalStorage("withdraws");
+      const deposits = APP.Binance.utils.getLocalStorage("deposits");
+
+      trades.forEach((trade) => {
+        APP.Binance.fillTradeTables(trade);
+      });
+
+      withdraws.forEach((withdraw) => {
+        APP.Binance.fillWithdrawTable(withdraw);
+      });
+
+      deposits.forEach((depo) => {
+        APP.Binance.fillDepositTable(depo);
+      });
+    },
+    infoButtons: function () {
+      const $networks = document.querySelectorAll(".js-get-networks");
+
+      $networks.forEach(($btn) => {
+        $btn.addEventListener("click", () => {
+          APP.Binance.getCoinsInformation();
+        });
+      });
+    },
+    createInterval: function ($dom, name, cb) {
+      this.config[name].interval = setInterval(() => {
+        this.config[name].curTime++;
+
+        if (this.config[name].curTime >= this.config[name].refresh) {
+          this.config[name].curTime = 0;
+          cb();
+        }
+
+        const timeLeft = this.config[name].refresh - this.config[name].curTime;
+        $dom.querySelector("span").innerHTML = `${timeLeft}s`;
+      }, 1000);
+
+      $dom.addEventListener("click", () => {
+        this.config[name].curTime = 0;
+        cb();
+      });
+    },
+  };
+
+  document.addEventListener("DOMContentLoaded", function (event) {
+    APP.Initilizer.init();
+  });
+})(window.APP);
+
+// Binance module
+(function (APP) {
+  APP.Binance = {
+    config: {
+      // url: "https://api.binance.com/",
+      url: "http://176.124.205.45:8200/", // proxy
+      keys: {
+        api: "API_KEY",
+        secret: "SECRET_KEY",
+      },
+      symbols: ["BTCUSDT", "USDTRUB", "ETHUSDT", "LTCUSDT", "XMRUSDT", "BNBUSDT"],
+    },
+    data: {
+      prevRates: [],
+      wallets: [],
+    },
+    utils: {
+      objectToQuery: function (obj) {
+        return Object.keys(obj)
+          .map((k) => `${k}=${obj[k]}`)
+          .join("&");
+      },
+      dateToTimestamp: function (date) {
+        return `${date.getDate()}.${date.getMonth()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+      },
+      signMessage: async function (message) {
+        const msgUint8_key = new TextEncoder().encode(APP.Binance.config.keys.secret);
+        const msgUint8_message = new TextEncoder().encode(message);
+
+        const importedKey = await crypto.subtle.importKey(
+          "raw",
+          msgUint8_key,
+          {
+            name: "HMAC",
+            hash: "SHA-256",
+          },
+          true,
+          ["sign"]
+        );
+
+        const signedKey = await crypto.subtle.sign("HMAC", importedKey, msgUint8_message);
+        const hashArray = Array.from(new Uint8Array(signedKey));
+
+        const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+        return hashHex;
+      },
+      saveLocalStorage: function (data, name) {
+        let arr = APP.Binance.utils.getLocalStorage(name);
+        arr.push(data);
+
+        localStorage.setItem(name, JSON.stringify(arr));
+      },
+      setLocalStorage: function (data, name) {
+        localStorage.setItem(name, JSON.stringify(data));
+      },
+      getLocalStorage: function (name) {
+        const arr = localStorage.getItem(name);
+        if (arr) {
+          return JSON.parse(arr);
+        } else {
+          return [];
+        }
+      },
+      handleFormAfterSubmit: function (status, $form) {
+        if (status === true) {
+          $form.reset();
+          $form.classList.remove("was-validated");
+        } else {
+          $form.querySelector('input[type="text"]').classList.add("is-invalid");
+        }
+      },
+    },
+
+    sendRequest: async function (url, data, config = {}) {
+      let request = {
+        method: config.method || "GET",
+        headers: config.credentials
+          ? {
+              "X-MBX-APIKEY": this.config.keys.api,
+            }
+          : {},
+      };
+
+      let urlParams = "";
+      let urlObject = data || {};
+
+      if (config.credentials) {
+        // const timestamp = await this.sendRequest("api/v3/time").then((res) => res.serverTime);
+        // server time is a bit ahead
+        const timestamp = Date.now();
+
+        urlObject = {
+          ...urlObject,
+          timestamp: timestamp,
+          recvWindow: 10000,
+        };
+
+        const signQuery = this.utils.objectToQuery(urlObject);
+        const signature = await this.utils.signMessage(signQuery);
+
+        urlObject = {
+          ...urlObject,
+          signature: signature,
+        };
+      }
+
+      if (Object.keys(urlObject).length) {
+        urlParams = "?" + this.utils.objectToQuery(urlObject);
+      }
+
+      console.log(`${request.method} ${url} || ${urlParams}`);
+      return fetch(`${this.config.url}${url}${urlParams}`, request)
+        .then(async (response) => {
+          if (response.ok) {
+            const jsonData = await response.json();
+            if (config.log) this.logResponce(jsonData, url);
+
+            return jsonData;
+          }
+          const err = await response.text();
+          throw new Error(err);
+        })
+        .catch((error) => {
+          this.handleError(error, url);
+        });
+    },
+    handleError: function (err, name) {
+      console.warn(err);
+      this.logResponce(err.message, `ERROR: ${name}`);
+    },
+
+    // FETCH METHODS
+    getRates: async function () {
+      const symbolStr = `%5B${this.config.symbols.map((symbol) => `%22${symbol}%22`).join(",")}%5D`;
+
+      const data = await this.sendRequest(
+        "api/v3/ticker/price",
+        { symbols: symbolStr },
+        { method: "GET", credentials: false }
+      );
+
+      if (data) this.renderRates(data);
+    },
+
+    getWallet: async function () {
+      const data = await this.sendRequest(
+        "sapi/v3/asset/getUserAsset",
+        // { needBtcValuation: true },
+        {},
+        { method: "POST", credentials: true }
+      );
+
+      if (data) this.renderWallet(data);
+    },
+
+    getWithdrawHistory: async function () {
+      const data = await this.sendRequest("sapi/v1/capital/withdraw/history", {}, { method: "GET", credentials: true });
+
+      if (data) {
+        let withdraws = APP.Binance.utils.getLocalStorage("withdraws");
+        withdraws = withdraws.map((w) => {
+          const dataWithdraw = data.find((x) => x.id === w.id);
+
+          return dataWithdraw
+            ? {
+                id: w.id,
+                status: dataWithdraw.status,
+                info: `${dataWithdraw.amount} ${dataWithdraw.coin}`,
+              }
+            : w;
+        });
+
+        this.utils.setLocalStorage(withdraws, "withdraws");
+
+        // redraw table
+        const $tableBody = document.querySelector(".js-withdraw-table tbody");
+        $tableBody.innerHTML = "";
+        withdraws.forEach((withdraw) => {
+          APP.Binance.fillWithdrawTable(withdraw);
+        });
+      }
+    },
+
+    sendMarketOrder: async function (formData, $form) {
+      const data = await this.sendRequest(
+        "api/v3/order",
+        { type: "market", side: formData.side, symbol: formData.pair, quantity: formData.quantity },
+        { method: "POST", credentials: true, log: true }
+      );
+
+      if (data) {
+        this.utils.saveLocalStorage(data, "trades");
+        this.fillTradeTables(data);
+      }
+
+      this.utils.handleFormAfterSubmit(data ? true : false, $form);
+    },
+
+    withdrawCoins: async function (formData, $form) {
+      const { coin, network, address, amount } = formData;
+
+      const data = await this.sendRequest(
+        "sapi/v1/capital/withdraw/apply",
+        { coin, network, address, amount },
+        { method: "POST", credentials: true, log: true }
+      );
+
+      if (data) {
+        this.utils.saveLocalStorage(data, "withdraws");
+        this.fillWithdrawTable({ ...data, info: `${amount} ${coin}`, status: "Новый" });
+      }
+      this.utils.handleFormAfterSubmit(data ? true : false, $form);
+    },
+
+    depositCoins: async function (formData, $form) {
+      const { coin, network } = formData;
+
+      const data = await this.sendRequest(
+        "sapi/v1/capital/deposit/address",
+        { coin, network },
+        { method: "GET", credentials: true, log: true }
+      );
+
+      if (data) {
+        this.utils.saveLocalStorage(data, "deposits");
+        this.fillDepositTable(data);
+      }
+      this.utils.handleFormAfterSubmit(data ? true : false, $form);
+    },
+
+    getCoinsInformation: async function () {
+      const data = await this.sendRequest("sapi/v1/capital/config/getall", {}, { method: "GET", credentials: true });
+
+      const coinsWhiteList = ["USDT", "BTC", "ETH", "LTC", "XMR"];
+      const filteredCoins = data.filter((x) => coinsWhiteList.includes(x.coin));
+
+      console.log(filteredCoins);
+
+      filteredCoins.forEach((coin) => {
+        const netList = coin.networkList.map((net, idx) => ({
+          network: `${net.network} (${net.name})`,
+          withdrawFee: net.withdrawFee,
+          minMax: `${net.withdrawMin}/${net.withdrawMax}`,
+        }));
+
+        this.logResponce(netList, `${coin.name} (${coin.coin})`, true);
+      });
+    },
+
+    // RENDER FUNCTIONS
+    renderRates: function (data) {
+      const $rates = document.querySelector(".js-rates");
+      let resultHtml = "";
+
+      const rateChange = (rate) => {
+        const rates = this.data.prevRates;
+        if (rates.length) {
+          const prev = rates.find((x) => x.symbol === rate.symbol);
+          const prevPrice = +prev.price;
+          const curPrice = +rate.price;
+
+          if (prevPrice === curPrice) return null;
+          return prevPrice < curPrice;
+        }
+        return null;
+      };
+
+      data.forEach((element) => {
+        const isUp = rateChange(element);
+
+        resultHtml += `<div class="col mt-2">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">${element.symbol}</h6>
+              <div class="card-text ${isUp === true ? "text-success" : ""} ${isUp === false ? "text-danger" : ""}">
+                ${Number(element.price).toFixed(2)}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      });
+
+      $rates.innerHTML = resultHtml;
+      this.data.prevRates = data;
+    },
+
+    renderWallet: async function (data) {
+      const $rates = document.querySelector(".js-accounts");
+      let resultHtml = "";
+
+      data.forEach((element) => {
+        resultHtml += `<div class="col mt-2">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">${element.asset}</h6>
+              <div class="card-text">
+                ${element.free}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      });
+
+      $rates.innerHTML = resultHtml;
+      this.data.wallets = data;
+    },
+
+    populateSelects: function () {
+      const $selects = document.querySelectorAll(".js-pair-select");
+
+      // 2 loop is required (Option instance is memorized otherwise)
+      for (let i = 0; i < $selects.length; i++) {
+        this.config.symbols.forEach((symbol) => {
+          const option = new Option(symbol, symbol);
+          $selects[i].options.add(option);
+        });
+      }
+    },
+
+    fillTradeTables: function (trade) {
+      const $tableBody = document.querySelectorAll(".js-trade-table tbody");
+      const dateString = this.utils.dateToTimestamp(new Date(trade.transactTime));
+
+      $tableBody.forEach(($table) => {
+        $table.insertAdjacentHTML(
+          "afterbegin",
+          `<tr>
+            <td class="${trade.side === "SELL" ? "text-danger" : ""} ${trade.side === "BUY" ? "text-success" : ""}">
+              ${trade.symbol}
+            </td>
+            <td class="">${dateString}</td>
+            <td>${trade.fills[0].price}</td>
+            <td>${trade.fills[0].qty}</td>
+            <td>${trade.fills[0].commission} ${trade.fills[0].commissionAsset}</td>
+          </tr>`
+        );
+      });
+    },
+
+    fillDepositTable: function (deposit) {
+      const $tableBody = document.querySelector(".js-deposit-table tbody");
+
+      $tableBody.insertAdjacentHTML(
+        "afterbegin",
+        `<tr>
+          <td>${deposit.coin}</td>
+          <td>${deposit.address}</td>
+          <td>${deposit.url}</td>
+          <td>${deposit.tag}</td>
+        </tr>`
+      );
+    },
+
+    fillWithdrawTable: function (withdraw) {
+      const $tableBody = document.querySelector(".js-withdraw-table tbody");
+
+      let status = withdraw.status || "";
+
+      if (status) {
+        switch (status) {
+          case 0:
+            status = "Email подтверждение";
+            break;
+          case 1:
+            status = "Отмена";
+            break;
+          case 2:
+            status = "Ожидает подтверждения";
+            break;
+          case 3:
+            status = "Отклонено";
+            break;
+          case 4:
+            status = "В процессе";
+            break;
+          case 5:
+            status = "Ошибка";
+            break;
+          case 6:
+            status = "Выполнено";
+            break;
+          default:
+            break;
+        }
+      }
+
+      $tableBody.insertAdjacentHTML(
+        "afterbegin",
+        `<tr>
+          <td>${withdraw.info}</td>
+          <td>${withdraw.id}</td>
+          <td>${status}</td>
+        </tr>`
+      );
+    },
+
+    // HELPER FUNCTIONS
+    logResponce: function (data, name) {
+      const $logger = document.querySelector(".js-logger");
+
+      const date = new Date();
+      const spaceBefore = $logger.innerHTML === "" ? "" : "\n\n";
+      const timestamp = `===== ${name} at ${this.utils.dateToTimestamp(date)} =====\n\n`;
+
+      $logger.innerHTML += spaceBefore + timestamp + JSON.stringify(data);
+
+      // if ($logger.scrollHeight - ($logger.scrollTop + $logger.clientHeight) < 50)
+
+      $logger.scrollTo({
+        top: $logger.scrollHeight,
+        left: 0,
+        behavior: "smooth",
+      });
+    },
+  };
+})(window.APP);
+</script>
+  </body>
+</html>
+
